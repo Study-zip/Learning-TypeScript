@@ -172,7 +172,7 @@ someString = ":)";
 
 다른 타입이 필요한 위치에서 null값을 사용하도록 허용하는 많은 타입시스템을 가리키는 업계 용어.
 
-strictNullChecks는 엄격한 null 검사를 활성화할지 여부를 결정한다. 비활성화시 모든 타입에 | null | undefined를 추가 해야 모든 변수가 null 또는 undefined를 할당할 수 있다.
+strictNullChecks는 엄격한 null 검사를 활성화할지 여부를 결정한다. 비활성화시 모든 타입에 | null | undefined를 추가한 것처럼 동작한다. 모든 변수가 null 또는 undefined를 할당할 수 있다.
 
 ```tsx
 let nameMaybe =
