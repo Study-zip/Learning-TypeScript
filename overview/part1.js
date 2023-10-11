@@ -1,3 +1,4 @@
+"use strict";
 function playerMaker0(name) {
     return {
         name,

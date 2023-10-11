@@ -1,3 +1,4 @@
+"use strict";
 const superPrint = (a) => a[0];
 const v = superPrint([1, 2, 3, 4]);
 const g = superPrint([true, true, false]);

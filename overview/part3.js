@@ -1,3 +1,4 @@
+"use strict";
 const push = (config) => {
     if (typeof config === "string") {
         console.log(config);

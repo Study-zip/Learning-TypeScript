@@ -1,3 +1,4 @@
+"use strict";
 const curry = {
     name: "curry",
     country: "India",

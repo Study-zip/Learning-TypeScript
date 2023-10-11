@@ -1,3 +1,4 @@
+"use strict";
 // 오브젝트 모양을 TS에게 설명해주기 위해서만 사용되는 키워드
 const hj = {
     name: "nhj",

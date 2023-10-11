@@ -1,3 +1,4 @@
+"use strict";
 class Dict {
     constructor() {
         this.words = {};

@@ -1,3 +1,4 @@
+"use strict";
 // 04. 객체
 const poet = {
     born: 1935,

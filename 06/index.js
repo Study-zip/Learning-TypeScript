@@ -1,3 +1,4 @@
+"use strict";
 // Chapter 6. 배열
 const warriors0 = ["Artemisia", "Bousdica"];
 // Ok: "Zenobia"의 타입은 string

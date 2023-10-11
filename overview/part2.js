@@ -1,3 +1,4 @@
+"use strict";
 let c;
 if (typeof c === "number") {
     let d = c + 1;

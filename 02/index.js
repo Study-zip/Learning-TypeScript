@@ -1,3 +1,4 @@
+"use strict";
 // Chapter 2. 타입시스템
 let rocker;
 rocker = "Joan Jett";
