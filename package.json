@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.8.4",
+    "ts-node": "^10.9.1",
+    "undici-types": "^5.25.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon --exec ts-node"
+  },
+  "dependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
