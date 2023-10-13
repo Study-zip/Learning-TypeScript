@@ -92,8 +92,3 @@ function useGivesBoth(instance) {
     instance.giveNumber(); // 타입: number
     instance.giveString(); // 타입: string
 }
-// 다음과 같음
-// interface Merged {
-//   fromFirst: string;
-//   fromSecond: number;
-// }

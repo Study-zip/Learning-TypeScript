@@ -301,3 +301,21 @@ interface Merged {
 //   fromFirst: string;
 //   fromSecond: number;
 // }
+
+// 이름이 충돌되는 멤버
+interface MergedProperties {
+  same: (input: boolean) => string;
+  diffrent: (input: string) => string;
+}
+
+// interface MergedProperties {
+//   same: (input: boolean) => string; // Ok
+//   diffrent: (input: number) => string; // Error
+// }
+
+interface MergedMethods {
+  diffrent(input: string): string;
+}
+interface MergedMethods {
+  different(input: number): string; // Ok
+}
