@@ -301,3 +301,162 @@ try {
 **non-null 어서션**
 
 타입 어서션이 유용한 경우를 하나 더 살펴보자면, 실제로는 아니고 이론적으로만 null 또는 undefined를 포함할 수 있는 변수에서 null과 undefined를 제거할 때 타입 어서션을 주로 사용한다. 타입스크립트에서는 너무 흔한 상황이라 이와 관련된 약어를 제공한다. null과 undefined를 제외한 값의 전체 타입을 작성하는 대신 !를 사용하면 된다. 즉, non-null 어서션은 타입이 Null 또는 undefined가 아니라고 간주한다.
+
+```tsx
+// 타입 유추: Date | undefined
+let maybeDate = Math.random() > 0.5 ? undefined : new Date();
+
+// 타입이 Date라고 간주됨
+maybeDate as Date;
+
+// 타입이 Date라고 간주됨
+maybeDate!;
+```
+
+non-null 어서션은 값을 반환하거나 존재하지 않는 경우 undefined를 반환하는 Map.get과 같은 API에서 특히 유용한다.
+
+```tsx
+const seasonCounts = new Map([
+  ["I Love Lucy", 6],
+  ["The Golden Girls", 7],
+]);
+
+// 타입: string | undefined
+const maybeValue = seasonCounts.get("I Love Lucy");
+
+console.log(maybeValue.toUpperCase()); // Error
+
+// 타입: string
+const knownValue = seasonCounts.get("The Golden Girls")!.toString();
+
+console.log(knownValue.toUpperCase());
+```
+
+**타입 어서션 주의 사항**
+
+any 타입과 마찬가지로 타입 어서션은 타입스크립트의 타입 시스템에 필요한 하나의 도피 수단이다. 따라서 any 타입을 사용할 때 처럼 꼭 필요한 경우가 아니라면 가능한 한 사용하지 말아야 한다. 값의 타입에 대해 더 쉽게 어서션하는 것보다 코드를 나타내는 더 정확한 타입을 갖는 게 좋다. 이런 어서션은 종종 잘못되기도 한다. 작성 당시 이미 잘못되었거나 코드베이스가 변경됨에 따라 나중에 달라지기도 한다.
+
+```tsx
+const seasonCounts0 = new Map([
+  ["I Love Lucy", 6],
+  ["The Golden Girls", 7],
+]);
+
+// 타입: string
+const knownValue0 = seasonCounts0.get("I Love Lucy")!.toString;
+console.log(knownValue0.toUpperCase()); // Error
+```
+
+타입 어서션은 자주 사용하면 안되고, 사용하는 것이 안전하다고 확실히 확신할 때만 사용해야 한다.
+
+**어서션 vs. 선언**
+
+변수 타입을 선언하기 위해 타입 에너테이션을 사용하는 것과 초깃값으로 변수 타입을 변경하기 위해 타입 어서션을 사용하는 것 사이에는 차이가 있습니다. 변수의 타입 애너테이션과 초깃값이 모두 있을 때, 타입스크립트의 타입 검사기는 변수의 타입 애너테이션에 대한 변수의 초깃값에 대해 할당 가능성 검사를 수행한다. 그러나 타입 어서션은 타입스크립트에 타입 검사 중 일부를 건너뛰도록 명시적으로 지시한다.
+
+```tsx
+interface Entertainer {
+  acts: string[];
+  name: string;
+}
+
+const declared: Entertainer = {
+  name: "Moms Mabley",
+};
+
+const asserted = {
+  name: "Moms Mabley",
+} as Entertainer; // 허용되지만 런타임 시 오류 발생
+
+// 다음 구문은 런타임 시 다음 오류로 인해 정상적으로 작동되지 않음
+console.log(declared.acts.join(", "));
+console.log(asserted.acts.join(", "));
+```
+
+따라서 타입 애너테이션을 사용하거나 타입스크립트가 초깃값에서 변수의 타입을 유추하도록 하는 것이 바람직하다.
+
+**어서션 할당 가능성**
+
+타입 어서션은 일부 값의 타입이 약산 잘못된 상황에서 필요한 작은 도피 수단일 뿐이다. 타입스크립트는 타입 중 하나가 다른 타입에 할당 가능한 경우에만 두 타입 간의 타입 어서션을 허용한다. 완전히 서로 관련이 없는 두 타입 사이에 타입 어서션이 있는 경우엔 타입스크립트가 타입 오류를 감지하고 알려준다.
+
+```jsx
+let myValue = "Stella" as *number*; // Error
+```
+
+하나의 타입에서 값을 완전히 관련 없는 타입으로 전환해야 하는 경우 이중 타입 어서션double type assertion을 사용한다. 먼저 값을 any나 unknown같은 top 타입으로 전환한 다음, 그 결과를 관련 없는 타입으로 전환한다.
+
+```jsx
+let myValueDouble = “1337” as unknown as number; // 허용되지만 이렇게 사용하면 안됨
+```
+
+`as unknown as…` 이중 타입 어서션은 위험하고 거의 항상 코드의 타입이 잘못되었다는 징후를 나타낸다. 타입 시스템의 도피 수단으로 이중 타입 어서션을 사용하면, 주변 코드를 변경해서 이전에 작동하던 코드에 문제가 발생할 경우, 타입 시스템이 여러분을 구해주지 못할 수 있음을 의미한다.
+
+### const 어서션
+
+const 어서션은 배열, 원시 타입, 값, 별칭 등 모든 값을 상수로 취급해야 함을 나타내는 데 사용한다. 특히 as const는 수신하는 모든 타입에 세 가지 규칙을 적용한다.
+
+- 배열은 가변 배열이 아니라 읽기 전용 튜플로 취급된다.
+- 리터럴은 일반적인 원시 타입과 동등하지 않고 리터럴로 취급된다.
+- 객체의 속성은 읽기 전용으로 간주된다.
+
+```tsx
+// 타입: (number | string)[]
+[0, ""];
+
+// 타입: readonly [0, '']
+[0, ""] as const;
+```
+
+as const가 생성하는 다른 두 가지 변경 사항
+
+**리터럴에서 원시 타입으로**
+
+타입 시스템이 리터럴 값을 일반적인 원시 타입으로 확장하기보다 특정 리터럴로 이해하는 것이 유용할 수 있다.
+
+예로 튜플을 반환하는 함수처럼 일반적인 원시 타입 대신 특정 리터럴을 생성한다고 알려진 함수에서 유용할 수 있다.
+
+```tsx
+// 타입: () => string
+const getName = () => "Maria Bamford";
+
+// 타입: () => "Maria Bamford"
+const getNameConst = () => "Maria Bamford" as const;
+```
+
+값의 특정 필드가 더 구체적인 리터럴 값을 갖도록 하는 것도 유용하다. 인기 있는 라이브러리는 값의 판별 필드가 특정 리터럴이 되도록 요구한다. 따라서 해당 코드의 타입이 값을 더 구체적으로 추론할 수 있다.
+
+```tsx
+interface Joke {
+  quote: string;
+  style: "story" | "one-liner";
+}
+
+function tellJoke(joke: Joke) {
+  if (joke.style === "one-liner") {
+    console.log(joke.quote);
+  } else {
+    console.log(joke.quote.split("\n"));
+  }
+}
+
+// 타입 : { quote: string; style: "one-liner"}
+const narrowJoke = {
+  quote: "If you stay alive for no other reason do it for spite.",
+  style: "one-liner" as const,
+};
+
+tellJoke(narrowJoke); // Ok
+
+// 타입: { quote: string; style: string }
+const wideObject = {
+  quote: "Time files when you are anxious!",
+  style: "one-liner",
+};
+
+tellJoke(wideObject); // Error
+```
+
+**읽기 전용 객체**
+
+변수의 초깃값으로 사용되는 것과 같은 객체 리터럴은 let 변수의 초깃값이 확장되는 것과 동일한 방식으로 속성 타입을 확장한다. apple 같은 문자열 값은 string과 같은 원시 타입이 되고, 배열은 튜플이 아닌 array 타입이 된다. 하지만 이런 값의 일부 또는 전체를 나중에 특정 리터럴 타입이 필요한 위치에서 사용해야할 때 잘 맞지 않을 수 있다.
+
+그러나 as const를 사용해 값 리터럴을 어서션하면 유추된 타입이 가능한 한 구체적으로 전환된다. 모든 멤버 속성은 readonly가 되고, 리터럴을 일반적인 원시 타입 대신 고유한 리터럴 타입으로 간주되며, 배열은 읽기 전용 튜플이 된다. 즉, 값 리터럴에 const 어서션을 적용하면 해당 값 리터럴이 변경되지 않고 모든 멤버에 동일한 const 어서션 로직이 재귀적으로 적용된다.
