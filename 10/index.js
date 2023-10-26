@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
@@ -200,3 +209,119 @@ logger.instanceLog([1, 2, 3]); // 타입: number[]
 BothLogger.staticLog([false, true]);
 // 유추된 OnStatic 타입 인수: string
 BothLogger.staticLog("You can't change the music of your soul");
+// 타입: (input: string) => number
+let creator;
+creator = (text) => text.length; // Ok
+function handleResult(result) {
+    if (result.succeeded) {
+        // result: SuccessfulResult<string>의 타입
+        console.log(`We did it! ${result.data}`);
+    }
+    else {
+        // result: FailureResult의 타입
+        console.error(`Awww... ${result.error}`);
+    }
+    //   result.data;
+}
+let explict = { value: 123 };
+let implicit = {
+    value: "Be yourself. The world worships the original",
+};
+// 타입: KeyValuePair<string, string>
+let allExplicit = {
+    key: "rating",
+    value: 10,
+};
+// 타입: KeyValuePair<string>
+let oneDefaulting = {
+    key: "rating",
+    value: "ten",
+};
+// let firstMissing: KeyValuePair = {
+//   // Error
+//   key: "rating",
+//   value: 10,
+// };
+function inTheEnd() { } // Ok
+function logWithLength(input) {
+    console.log(`Length: ${input.length}`);
+    return input;
+}
+logWithLength("No one can figure out your worth but you"); // 타입: string
+logWithLength([false, true]); // 타입: boolean[]
+logWithLength({ length: 123 }); // 타입: { length: number }
+// logWithLength(new Date());
+// keyof와 제한된 타입 매개변수
+function get(container, key) {
+    return container[key];
+}
+const roles = {
+    favorite: "Fargo",
+    others: ["Almost Famous", "Burn After Reading", "Nomadland"],
+};
+const favorite = get(roles, "favorite"); // 타입: string
+const others = get(roles, "others"); // 타입: string[]
+// const missing = get(roles, "extras"); // Error
+function get0(container, key) {
+    return container[key];
+}
+const roles0 = {
+    favorite: "Fargo",
+    others: ["Almost Famous", "Burn After Reading", "Nomadland"],
+};
+const found = get0(roles0, "favorite"); // 타입 string | string[]
+// Promise
+// Promise 생성
+class PromiseLike {
+    constructor(executor) {
+        /*...*/
+    }
+}
+// 타입: Promise<unknown>
+const resolvesUnknown = new Promise((resolve) => {
+    setTimeout(() => resolve("Done!"), 1000);
+});
+// 타입: Promise<string>
+const resolvesString = new Promise((resolve) => {
+    setTimeout(() => resolve("Done!"), 1000);
+});
+// 타입: Promise<string>
+const textEventually = new Promise((resolve) => {
+    setTimeout(() => resolve("Done!"), 1000);
+});
+// 타입: Promise<number>
+const lengthEventually = textEventually.then((text) => text.length);
+// async 함수
+// 타입: (text: string) => Promise<number>
+function lengthAfterSecond(text) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield new Promise((resolve) => setTimeout(resolve, 1000));
+        return text.length;
+    });
+}
+// 타입: (text: string) => Promise<number>
+function lengthImmediately(text) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return text.length;
+    });
+}
+// Ok
+function givesPromiseForString() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return "Done!";
+    });
+}
+// async function givesString(): string {
+//   return "done"; // Error
+// }
+// 제네릭 올바르게 사용하기
+function logInput(input) {
+    console.log("hi!", input);
+} // 1번 사용함 - 부적절
+function logInput0(input) {
+    console.log("Hi", input);
+} // 제네릭 쓰지 않고 사용하기
+function labelBox(label, value) {
+    /*... */
+}
+export {};

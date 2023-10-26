@@ -1,3 +1,5 @@
+import { resolve } from "path";
+
 // chapter 10 제네릭
 function identity0(input: any) {
   return input;
@@ -309,3 +311,187 @@ BothLogger.staticLog([false, true]);
 
 // 유추된 OnStatic 타입 인수: string
 BothLogger.staticLog<string>("You can't change the music of your soul");
+
+// 제네릭 타입 별칭
+type Nillish<T> = T | null | undefined;
+
+type CreatesValue<Input, Output> = (input: Input) => Output;
+
+// 타입: (input: string) => number
+let creator: CreatesValue<string, number>;
+
+creator = (text) => text.length; // Ok
+
+// creator = (text) => text.toUpperCase; // Error
+
+// 제네릭 판별된 유니언
+type Result<Data> = FailureResult | SuccessfulResult<Data>;
+
+interface FailureResult {
+  error: Error;
+  succeeded: false;
+}
+
+interface SuccessfulResult<Data> {
+  data: Data;
+  succeeded: true;
+}
+
+function handleResult(result: Result<string>) {
+  if (result.succeeded) {
+    // result: SuccessfulResult<string>의 타입
+    console.log(`We did it! ${result.data}`);
+  } else {
+    // result: FailureResult의 타입
+    console.error(`Awww... ${result.error}`);
+  }
+
+  //   result.data;
+}
+
+// 제네릭 제한자
+// 제네릭 기본값
+interface Quote0<T = string> {
+  value: T;
+}
+
+let explict: Quote0<number> = { value: 123 };
+let implicit: Quote0 = {
+  value: "Be yourself. The world worships the original",
+};
+// let mismatch: Quote0 = { value: 123 };
+
+interface KeyValuePair<Key, Value = Key> {
+  key: Key;
+  value: Value;
+}
+
+// 타입: KeyValuePair<string, string>
+let allExplicit: KeyValuePair<string, number> = {
+  key: "rating",
+  value: 10,
+};
+
+// 타입: KeyValuePair<string>
+let oneDefaulting: KeyValuePair<string> = {
+  key: "rating",
+  value: "ten",
+};
+
+// let firstMissing: KeyValuePair = {
+//   // Error
+//   key: "rating",
+//   value: 10,
+// };
+
+function inTheEnd<First, Second, Third = number, Fourth = string>() {} // Ok
+
+// function inTheMiddle<First, Second = boolean, Third = number, Fourth>(){} // Error
+
+// 제한된 제네릭 타입
+interface WithLength {
+  length: number;
+}
+
+function logWithLength<T extends WithLength>(input: T) {
+  console.log(`Length: ${input.length}`);
+  return input;
+}
+
+logWithLength("No one can figure out your worth but you"); // 타입: string
+logWithLength([false, true]); // 타입: boolean[]
+logWithLength({ length: 123 }); // 타입: { length: number }
+
+// logWithLength(new Date());
+
+// keyof와 제한된 타입 매개변수
+function get<T, Key extends keyof T>(container: T, key: Key) {
+  return container[key];
+}
+
+const roles = {
+  favorite: "Fargo",
+  others: ["Almost Famous", "Burn After Reading", "Nomadland"],
+};
+
+const favorite = get(roles, "favorite"); // 타입: string
+const others = get(roles, "others"); // 타입: string[]
+
+// const missing = get(roles, "extras"); // Error
+
+function get0<T>(container: T, key: keyof T) {
+  return container[key];
+}
+
+const roles0 = {
+  favorite: "Fargo",
+  others: ["Almost Famous", "Burn After Reading", "Nomadland"],
+};
+
+const found = get0(roles0, "favorite"); // 타입 string | string[]
+
+// Promise
+// Promise 생성
+class PromiseLike<Value> {
+  constructor(
+    executor: (
+      resolve: (value: Value) => void,
+      reject: (reason: unknown) => void
+    ) => void
+  ) {
+    /*...*/
+  }
+}
+// 타입: Promise<unknown>
+const resolvesUnknown = new Promise((resolve) => {
+  setTimeout(() => resolve("Done!"), 1000);
+});
+
+// 타입: Promise<string>
+const resolvesString = new Promise<string>((resolve) => {
+  setTimeout(() => resolve("Done!"), 1000);
+});
+
+// 타입: Promise<string>
+const textEventually = new Promise<string>((resolve) => {
+  setTimeout(() => resolve("Done!"), 1000);
+});
+
+// 타입: Promise<number>
+const lengthEventually = textEventually.then((text) => text.length);
+
+// async 함수
+
+// 타입: (text: string) => Promise<number>
+async function lengthAfterSecond(text: string) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return text.length;
+}
+
+// 타입: (text: string) => Promise<number>
+async function lengthImmediately(text: string) {
+  return text.length;
+}
+
+// Ok
+async function givesPromiseForString(): Promise<string> {
+  return "Done!";
+}
+
+// async function givesString(): string {
+//   return "done"; // Error
+// }
+
+// 제네릭 올바르게 사용하기
+
+function logInput<Input extends string>(input: Input) {
+  console.log("hi!", input);
+} // 1번 사용함 - 부적절
+
+function logInput0(input: string) {
+  console.log("Hi", input);
+} // 제네릭 쓰지 않고 사용하기
+
+function labelBox<Label, Value>(label: Label, value: Value) {
+  /*... */
+}
